@@ -1,98 +1,145 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# domhome-cli
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> Interactive CLI prototype for Zigbee smart-home control via a Sonoff ZBDongle-E (EZSP / EmberZNet).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **Start / stop** the Zigbee coordinator
+- **Permit join** – open the network for new devices for N seconds
+- **List paired devices** with model, manufacturer, power source, endpoints and capabilities
+- **Control smart plugs** – send ON / OFF / Toggle commands via the ZCL On/Off cluster
+- **Real-time event logging** – device join, interview progress, messages, adapter disconnect
+- **Persistent storage** – paired devices are remembered across restarts (SQLite-like DB file)
+- **Graceful shutdown** on Ctrl+C
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requirements
 
-## Project setup
+| Requirement   | Version                                                         |
+| ------------- | --------------------------------------------------------------- |
+| Node.js       | ≥ 18                                                            |
+| npm           | ≥ 9                                                             |
+| Zigbee dongle | Sonoff ZBDongle-E (EZSP) — or any Silicon Labs EmberZNet dongle |
+
+## Quick Start
+
+### 1. Clone & install
 
 ```bash
-$ npm install
+cd domhome-core
+npm install
 ```
 
-## Compile and run the project
+### 2. Configure
+
+Copy the example env file and edit it:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+Edit `.env` with your serial port:
+
+| Variable             | Windows example    | Linux / Raspberry Pi example     |
+| -------------------- | ------------------ | -------------------------------- |
+| `ZIGBEE_SERIAL_PORT` | `COM5`             | `/dev/ttyUSB0` or `/dev/ttyACM0` |
+| `ZIGBEE_BAUD_RATE`   | `115200`           | `115200`                         |
+| `ZIGBEE_ADAPTER`     | `ember`            | `ember`                          |
+| `ZIGBEE_DB_PATH`     | `./data/zigbee.db` | `./data/zigbee.db`               |
+| `LOG_LEVEL`          | `info`             | `info` (or `debug` for verbose)  |
+
+**Finding your serial port:**
+
+- **Windows:** Open Device Manager → Ports (COM & LPT) → look for _Silicon Labs_ or _Sonoff_ → note the COM number.
+- **Linux:** Run `ls /dev/ttyUSB* /dev/ttyACM*` or `dmesg | grep tty` after plugging in the dongle.
+
+### 3. Run
+
+**Development mode (ts-node, no build step):**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run dev
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Production mode (compile first):**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run build
+npm start
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Use the menu
 
-## Resources
+```
+╔═══════════════════════════════════════════════════════════╗
+║          🏠  domhome-cli  –  Zigbee Shell  v0.1          ║
+╚═══════════════════════════════════════════════════════════╝
 
-Check out a few resources that may come in handy when working with NestJS:
+? domhome-cli — Main Menu (Use arrow keys)
+❯ 🚀  Start Zigbee coordinator
+  📜  Show live logs info
+  🚪  Exit (graceful shutdown)
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+After starting the coordinator, additional options appear:
 
-## Support
+- **Enable pairing** – enter duration in seconds; then put your Zigbee device into pairing mode.
+- **List devices** – see all paired devices with details.
+- **Control a device** – pick a device from the list, then choose ON / OFF / Toggle.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Project Structure
 
-## Stay in touch
+```
+src/
+├── index.ts                 Entry-point: banner, config, menu loop
+├── config.ts                .env parsing & validation
+├── zigbee/
+│   ├── coordinator.ts       zigbee-herdsman Controller lifecycle
+│   ├── deviceRegistry.ts    Device listing, lookup, typed wrappers
+│   └── actions.ts           On/Off ZCL commands
+├── cli/
+│   ├── menu.ts              Inquirer main-menu loop
+│   └── screens.ts           Individual screen implementations
+└── utils/
+    ├── logger.ts            Pino logger setup
+    └── errors.ts            Custom error classes
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## How On/Off Control Works
+
+1. The `DeviceRegistry` scans each device's endpoints for the **genOnOff** input cluster (ZCL cluster ID `6`).
+2. When you select "Control a device", only devices with On/Off support are selectable.
+3. The `actions.ts` module calls `endpoint.command('genOnOff', '<action>', {})` where `<action>` is `on`, `off`, or `toggle`.
+4. This sends a standard ZCL cluster-specific command frame to the device's endpoint.
+
+## Adapter Compatibility
+
+| Dongle                     | Adapter setting | Notes                                             |
+| -------------------------- | --------------- | ------------------------------------------------- |
+| Sonoff ZBDongle-E          | `ember` ✅      | EmberZNet / Silicon Labs EFR32 (firmware ≥ 7.4.x) |
+| Sonoff ZBDongle-E (old FW) | `ezsp`          | Legacy, deprecated — use `ember` if possible      |
+| Sonoff ZBDongle-P          | `zstack`        | Texas Instruments CC2652                          |
+| ConBee II / III            | `deconz`        | Dresden Elektronik                                |
+
+## Troubleshooting
+
+| Error                                     | Fix                                                                                                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _Serial port not found_                   | Check `ZIGBEE_SERIAL_PORT` in `.env`. Make sure the dongle is plugged in.                                                                                      |
+| _Permission denied_                       | Linux: `sudo chmod 666 /dev/ttyUSB0` or add your user to the `dialout` group.                                                                                  |
+| _Port is busy_                            | Close Zigbee2MQTT, ZHA, or any other program using the same port.                                                                                              |
+| _Failure to connect_ / _Gecko Bootloader_ | Dongle is stuck in bootloader. Switch to `ZIGBEE_ADAPTER=ember`, unplug the dongle for 5 s, plug it back in, and retry. If it persists, re-flash the firmware. |
+| _ezsp driver is deprecated_               | Set `ZIGBEE_ADAPTER=ember` in `.env`. The `ember` adapter replaces the legacy `ezsp` driver for firmware ≥ 7.4.x.                                              |
+| _Interview failed_                        | Device may be too far away. Move it closer to the coordinator and try again.                                                                                   |
+
+## Scripts
+
+| Script          | Description                          |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Run directly with ts-node (no build) |
+| `npm run build` | Compile TypeScript to `dist/`        |
+| `npm start`     | Run the compiled JS from `dist/`     |
+| `npm run clean` | Delete `dist/` folder                |
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
